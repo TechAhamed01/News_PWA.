@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { fetchAllNews, fetchNewsByCategory } from './services/api';
 import './styles/App.css';
 
 function App() {
@@ -7,64 +8,6 @@ function App() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-
-  // Mock news data - in a real app, this would come from your Django backend
-  const mockArticles = [
-    {
-      id: 1,
-      title: "Breaking: New Technology Revolutionizes Web Development",
-      excerpt: "A groundbreaking new framework promises to change how developers build modern web applications with improved performance and developer experience.",
-      category: "technology",
-      date: "2025-10-12",
-      readTime: "5 min read",
-      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&h=400"
-    },
-    {
-      id: 2,
-      title: "Global Markets Respond to Economic Policy Changes",
-      excerpt: "World markets show mixed reactions as major economies announce new fiscal measures aimed at stabilizing growth in uncertain times.",
-      category: "business",
-      date: "2025-10-11",
-      readTime: "7 min read",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&h=400"
-    },
-    {
-      id: 3,
-      title: "Scientists Discover New Species in Remote Rainforest",
-      excerpt: "Biologists document previously unknown creatures during expedition to uncharted territories, highlighting the importance of biodiversity conservation.",
-      category: "science",
-      date: "2025-10-10",
-      readTime: "4 min read",
-      image: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?auto=format&fit=crop&w=600&h=400"
-    },
-    {
-      id: 4,
-      title: "Championship Finals Draw Record-Breaking Viewership",
-      excerpt: "Sports fans around the globe tune in for the most-watched event of the year, with streaming platforms reporting unprecedented engagement.",
-      category: "sports",
-      date: "2025-10-09",
-      readTime: "3 min read",
-      image: "https://images.unsplash.com/photo-1541252260730-0412e8e2108e?auto=format&fit=crop&w=600&h=400"
-    },
-    {
-      id: 5,
-      title: "Renewable Energy Investments Reach All-Time High",
-      excerpt: "Global funding for sustainable technologies surpasses previous records as climate goals accelerate and green initiatives gain momentum.",
-      category: "environment",
-      date: "2025-10-08",
-      readTime: "6 min read",
-      image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600&h=400"
-    },
-    {
-      id: 6,
-      title: "Cultural Festival Celebrates Diversity in Major Cities",
-      excerpt: "Annual multicultural event brings together communities from around the world in celebration of art, music, and shared human experiences.",
-      category: "culture",
-      date: "2025-10-07",
-      readTime: "4 min read",
-      image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=400"
-    }
-  ];
 
   const categories = [
     { id: 'all', name: 'All News' },
@@ -96,32 +39,61 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Simulate API call to Django backend
-    const fetchArticles = () => {
-      if (!isOnline) {
-        setLoading(false);
-        return;
-      }
-      
-      setTimeout(() => {
-        setArticles(mockArticles);
-        setLoading(false);
-      }, 1000);
-    };
-
     fetchArticles();
-  }, [isOnline]);
+  }, [isOnline, activeCategory]);
+
+  const fetchArticles = async () => {
+    if (!isOnline) {
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      let data;
+      if (activeCategory === 'all') {
+        data = await fetchAllNews();
+      } else {
+        data = await fetchNewsByCategory(activeCategory);
+      }
+      setArticles(data);
+    } catch (error) {
+      console.error('Failed to fetch articles:', error);
+      // Fallback to mock data if API fails
+      setArticles(mockArticles);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock news data - fallback if API is not available
+  const mockArticles = [
+    {
+      id: 1,
+      title: "Breaking: New Technology Revolutionizes Web Development",
+      excerpt: "A groundbreaking new framework promises to change how developers build modern web applications with improved performance and developer experience.",
+      category: "technology",
+      date: "2025-10-12",
+      readTime: "5 min read",
+      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&h=400"
+    },
+    {
+      id: 2,
+      title: "Global Markets Respond to Economic Policy Changes",
+      excerpt: "World markets show mixed reactions as major economies announce new fiscal measures aimed at stabilizing growth in uncertain times.",
+      category: "business",
+      date: "2025-10-11",
+      readTime: "7 min read",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&h=400"
+    }
+  ];
 
   const filteredArticles = activeCategory === 'all' 
     ? articles 
     : articles.filter(article => article.category === activeCategory);
 
   const handleRefresh = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setArticles([...mockArticles]);
-      setLoading(false);
-    }, 800);
+    fetchArticles();
   };
 
   return (
