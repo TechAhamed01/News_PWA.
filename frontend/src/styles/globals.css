@@ -61,6 +61,31 @@
   }
 }
 
+/* Gradient color classes */
+.from-gradient-purple {
+  @apply from-[hsl(270,85%,65%)] !important;
+}
+
+.to-gradient-pink {
+  @apply to-[hsl(330,85%,65%)] !important;
+}
+
+.from-gradient-cyan {
+  @apply from-[hsl(190,85%,65%)] !important;
+}
+
+.to-gradient-blue {
+  @apply to-[hsl(220,85%,65%)] !important;
+}
+
+.from-gradient-orange {
+  @apply from-[hsl(25,85%,65%)] !important;
+}
+
+.to-gradient-red {
+  @apply to-[hsl(0,85%,65%)] !important;
+}
+
 /* Glassmorphism effects */
 .glass {
   @apply bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/20 dark:border-white/10;

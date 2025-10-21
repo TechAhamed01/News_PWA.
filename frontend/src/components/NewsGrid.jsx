@@ -4,7 +4,7 @@ import { Clock, Share2 } from 'lucide-react';
 import { categories } from '../data/mockData';
 
 const NewsCard = ({ article, index }) => {
-  const category = categories.find(cat => cat.id === article.category);
+  const category = categories.find(cat => cat.id === article.category) || categories[0];
 
   return (
     <motion.article
@@ -21,15 +21,18 @@ const NewsCard = ({ article, index }) => {
             src={article.image}
             alt={article.title}
             className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={(e) => {
+              e.target.src = 'https://images.unsplash.com/photo-1495020689067-95885607937b?w=800&h=500&fit=crop';
+            }}
           />
           
           {/* Gradient Overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${category?.color} mix-blend-overlay`} />
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${category?.color || 'from-gradient-purple to-gradient-pink'} mix-blend-overlay`} />
           
           {/* Category Badge */}
           <div className="absolute top-4 left-4">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r ${category?.color} backdrop-blur-sm`}>
-              {category?.name}
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r ${category?.color || 'from-gradient-purple to-gradient-pink'} backdrop-blur-sm`}>
+              {category?.name || 'General'}
             </span>
           </div>
 
@@ -79,7 +82,7 @@ const NewsCard = ({ article, index }) => {
 const NewsGrid = ({ articles }) => {
   // Group articles by category for better organization
   const articlesByCategory = articles.reduce((acc, article) => {
-    const category = categories.find(cat => cat.id === article.category);
+    const category = categories.find(cat => cat.id === article.category) || { name: 'General', id: 'general' };
     if (!acc[category.name]) {
       acc[category.name] = [];
     }

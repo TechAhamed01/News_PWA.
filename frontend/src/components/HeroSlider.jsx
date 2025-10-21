@@ -7,6 +7,8 @@ const HeroSlider = ({ articles }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
+    if (articles.length === 0) return;
+    
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % articles.length);
     }, 5000);
@@ -14,17 +16,28 @@ const HeroSlider = ({ articles }) => {
   }, [articles.length]);
 
   const nextSlide = () => {
+    if (articles.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % articles.length);
   };
 
   const prevSlide = () => {
+    if (articles.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + articles.length) % articles.length);
   };
 
-  const currentArticle = articles[currentIndex];
-  const category = categories.find(cat => cat.id === currentArticle?.category);
+  if (!articles || articles.length === 0) {
+    return (
+      <div className="relative h-[70vh] min-h-[500px] overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">No featured articles available</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Please check back later for updates</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (!currentArticle) return null;
+  const currentArticle = articles[currentIndex];
+  const category = categories.find(cat => cat.id === currentArticle?.category) || categories[0];
 
   return (
     <div className="relative h-[70vh] min-h-[500px] overflow-hidden">
@@ -42,7 +55,7 @@ const HeroSlider = ({ articles }) => {
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${currentArticle.image})` }}
           />
-          <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent ${category?.color} mix-blend-overlay`} />
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent ${category?.color || 'from-gradient-purple to-gradient-pink'} mix-blend-overlay`} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
           {/* Content */}
@@ -55,8 +68,8 @@ const HeroSlider = ({ articles }) => {
               >
                 {/* Category Badge */}
                 <div className="flex items-center space-x-4 mb-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${category?.color} backdrop-blur-sm`}>
-                    {category?.name}
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${category?.color || 'from-gradient-purple to-gradient-pink'} backdrop-blur-sm`}>
+                    {category?.name || 'General'}
                   </span>
                   <div className="flex items-center space-x-1 text-sm text-gray-300">
                     <Clock className="w-4 h-4" />

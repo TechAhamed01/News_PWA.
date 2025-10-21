@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Sun, Moon, Menu, X } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { categories } from '../data/mockData';
